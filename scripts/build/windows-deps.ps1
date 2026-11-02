@@ -8,10 +8,13 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
+Write-Host "PROBE entry $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
 $before = @{}
 Get-ChildItem Env: | ForEach-Object { $before[$_.Name] = $_.Value }
 . (Join-Path $PSScriptRoot '..\windows-build-deps.ps1')
+Write-Host "PROBE sourced $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
 Initialize-HermesArm64BuildTools -StateRoot $StateRoot -OpenSSLRoot $OpenSSLRoot
+Write-Host "PROBE initialized $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
 
 $after = @{}
 Get-ChildItem Env: | ForEach-Object { $after[$_.Name] = $_.Value }

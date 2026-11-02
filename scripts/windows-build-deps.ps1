@@ -113,11 +113,15 @@ function Initialize-HermesArm64BuildTools {
     if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
         throw 'ARM64 build dependencies require Windows.'
     }
+    Write-Host "PROBE init-start $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
     $buildRoot = Join-Path $StateRoot 'build-tools'
     New-Item -ItemType Directory -Force -Path $buildRoot | Out-Null
     $script:HermesBuildLog = Join-Path $buildRoot 'build.log'
+    Write-Host "PROBE before-vswhere $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
     $vs = Get-HermesArm64VisualStudio
+    Write-Host "PROBE after-vswhere $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
     $clangPath = Get-HermesClang -VisualStudio $vs
+    Write-Host "PROBE after-clang $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
     if (-not $vs -or -not $clangPath) {
         $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
         $principal = New-Object Security.Principal.WindowsPrincipal($identity)
@@ -186,6 +190,7 @@ function Initialize-HermesArm64BuildTools {
             if ($line -match '^([^=]+)=(.*)$') { Set-Item -LiteralPath "env:$($matches[1])" -Value $matches[2] }
         }
     }
+    Write-Host "PROBE after-vsdevcmd $([DateTime]::UtcNow.ToString('HH:mm:ss.fff'))"
     if (-not (Get-Command cl.exe -ErrorAction SilentlyContinue)) { throw 'ARM64 C++ compiler is unavailable after environment setup' }
     # With VSCMD_ARG_TGT_ARCH exported, rustc's cc crate takes link.exe from PATH
     # instead of asking vswhere. Under Git Bash that is coreutils' link.exe, so

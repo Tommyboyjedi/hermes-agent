@@ -143,7 +143,7 @@ runs:
         _PM_TOOLCHAIN: ${{ inputs.toolchain }}
         _PM_PACKAGES: ${{ inputs.packages }}
       run: |
-        "$_PM_BOOTSTRAP" -S "$_PM_ACTION/../../../scripts/ci/setup_toolchain.py" install \
+        "$_PM_BOOTSTRAP" -S -m cProfile -s cumtime "$_PM_ACTION/../../../scripts/ci/setup_toolchain.py" install \
           --toolchain "$_PM_TOOLCHAIN" --packages "$_PM_PACKAGES" --home "$HERMES_HOME"
 
     - name: Cache uv dependency downloads and builds
@@ -220,8 +220,8 @@ runs:
       run: |
         args=()
         if [ "$_PM_TEST_ENVIRONMENT" = true ]; then args+=(--test-environment); fi
-        "$HERMES_PYTHON" -S "$_PM_ACTION/../../../scripts/ci/setup_toolchain.py" dependencies \
-          --toolchain "$_PM_TOOLCHAIN" --extras "$_PM_EXTRAS" --home "$HERMES_HOME" "${args[@]}"
+        "$HERMES_PYTHON" -S -m cProfile -s cumtime "$_PM_ACTION/../../../scripts/ci/setup_toolchain.py" dependencies \
+          --toolchain "$_PM_TOOLCHAIN" --extras "$_PM_EXTRAS" --home "$HERMES_HOME" "${args[@]}" | head -120
 
     - name: Log PM cache restore results and save policy
       if: always()
